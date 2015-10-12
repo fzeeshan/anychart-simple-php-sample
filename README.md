@@ -1,7 +1,8 @@
-# anychart php integration sample, based on Slim
+# anychart simple php integration sample
 
 ## Project structure
 * public/ - static and dynamic resources
+* public/index.html - dashboard html
 * public/jsx - react jsx sources
 * public/js - javascript sources
 * public/init.php - initial data for filters
