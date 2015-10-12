@@ -1,7 +1,7 @@
 <?php
 require './data/Data.php';
 
-$data = new \Data('anychart_sample', 'user', 'pass');
+$data = new \Data();
 
 header('Content-Type: application/json');
 echo json_encode(array(

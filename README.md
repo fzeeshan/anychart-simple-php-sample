@@ -22,6 +22,8 @@ MySQL:
 
 Bash: `mysql -u user -p anychart_sample < dump.sql`
 
+You can change mysql connection settings in `public/data/Data.php` class constructor.
+
 ## Running on server
 Copy `public` folder to your server and open folder in browser.
 

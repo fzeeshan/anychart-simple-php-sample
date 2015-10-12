@@ -4,38 +4,49 @@ class Data {
 
     private $db;
 
-    function __construct($db, $user, $pass) {
+    function __construct() {
+        $db = 'anychart_sample';
+        $user = 'user';
+        $pass = 'pass';
         $this->db = new PDO('mysql:host=localhost;dbname='.$db.';charset=utf8', $user, $pass);
         $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     }
 
     function years() {
+        // get all years from sales
         $stmt = $this->db->query('SELECT YEAR(sales.date) AS year FROM sales GROUP BY 1;');
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
     function products() {
+        // get all products from db
         return $this->db->query('SELECT id, industry_id, name FROM products ORDER BY name;')->fetchAll();
     }
 
     function industries() {
+        // get all industries from db
         return $this->db->query('SELECT id, name FROM industries ORDER BY name;')->fetchAll();
     }
 
     function salesReps() {
+        // get all sales reps from db
         return $this->db->query('SELECT id, name FROM sales_reps ORDER BY name')->fetchAll();
     }
 
     function regions() {
+        // get all regions from db
         return $this->db->query('SELECT id, name FROM regions ORDER BY name')->fetchAll();
     }
 
     function quarters () {
+        // quarters are predefined
         return [1, 2, 3, 4];
     }
 
     private function createQueryFilters($years, $quarters, $products,
                                         $regions, $industries, $sales) {
+        // pdo doesn't support IN () sql construction
+        // we need to create IN (?, ?, ?)
         $regions_q = implode(',', array_fill(0, count($regions), '?'));
         $sales_q = implode(',', array_fill(0, count($sales), '?'));
         $years_q = implode(',', array_fill(0, count($years), '?'));
@@ -53,6 +64,8 @@ class Data {
 
     private function bindQueryFiltersParams($stmt, $years, $quarters, $products,
                                             $regions, $industries, $sales) {
+        // pdo doesn't support IN () sql construction,
+        // this method merges all filters params and add them to the query
         $params = array_merge($regions, $sales,
                               $industries, $products,
                               $years, $quarters);
@@ -62,7 +75,8 @@ class Data {
 
     function revenueByIndustry($years, $quarters, $products, $regions,
                                $industries, $salesReps) {
-        
+
+        // get revenue grouped by industry with filters
         $stmt = $this->db->prepare('SELECT 
                                      industries.name,
                                      SUM(sales.total)
@@ -79,6 +93,7 @@ class Data {
         $this->bindQueryFiltersParams($stmt, $years, $quarters, $products, $regions,
                                       $industries, $salesReps);
         $stmt->execute();
+        // get result as array of arrays
         return $stmt->fetchAll(PDO::FETCH_NUM);
     }
 
@@ -100,11 +115,13 @@ class Data {
         $this->bindQueryFiltersParams($stmt, $years, $quarters, $products, $regions,
                                       $industries, $salesReps);
         $stmt->execute();
+        // get result as array of arrays
         return $stmt->fetchAll(PDO::FETCH_NUM);
     }
 
     function revenueBySalesRep($years, $quarters, $products, $regions,
                                $industries, $salesReps) {
+        // get revenue grouped by sales reps with filters
         $stmt = $this->db->prepare('SELECT 
                                      sales_reps.name,
                                      SUM(sales.total)
@@ -122,14 +139,17 @@ class Data {
         $this->bindQueryFiltersParams($stmt, $years, $quarters, $products, $regions,
                                       $industries, $salesReps);
         $stmt->execute();
+        // get result as array of arrays
         return $stmt->fetchAll(PDO::FETCH_NUM);
     }
 
     function revenueByQuarter($years, $quarters, $products, $regions,
                               $industries, $salesReps) {
+        // get revenue grouped by quarter
         $quarters = array_map('intval', $quarters);
         $query = 'SELECT YEAR(sales.date)';
         foreach ($quarters as $q) {
+            // we use CASE WHEN THEN ELSE END for quarter revenue calculation
             $query .= ',SUM(CASE WHEN QUARTER(sales.date)='.$q.' THEN sales.total ELSE 0 END) ';
         }
         $query .= 'FROM industries, sales, products
@@ -144,6 +164,7 @@ class Data {
         $this->bindQueryFiltersParams($stmt, $years, $quarters, $products, $regions,
                                       $industries, $salesReps);
         $stmt->execute();
+        // get result as array of arrays
         return $stmt->fetchAll(PDO::FETCH_NUM);
     }
 }
