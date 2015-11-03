@@ -2,7 +2,7 @@ $(function() {
     var revenueByIndustry = anychart.data.set();
     var revenueBySales = anychart.data.set();
     var revenueByProduct = anychart.data.set();
-    var revenueByQuarter = anychart.data.set();
+    var revenueByQuarter;
 
     var createCharts = function() {
         var bar = anychart.bar(revenueByIndustry);
@@ -20,18 +20,21 @@ $(function() {
         pie.title("Revenue by product");
         pie.draw();
 
-        var line = anychart.line(revenueByQuarter);
-        line.container("rev-by-quarter");
-        line.title("Revenue by quarter");
-        line.draw();
+        revenueByQuarter = anychart.line(revenueByQuarter);
+        revenueByQuarter.container("rev-by-quarter");
+        revenueByQuarter.title("Revenue by quarter");
+        revenueByQuarter.draw();
     };
 
     var updateDataSets = function(data) {
-        console.log(data);
         revenueByIndustry.data(data["by_industry"]);
         revenueBySales.data(data["by_sales"]);
         revenueByProduct.data(data["by_product"]);
-        revenueByQuarter.data(data["by_quarter"]);
+
+        revenueByQuarter.removeAllSeries();
+        revenueByQuarter.addSeries.apply(
+            revenueByQuarter,
+            anychart.data.mapAsTable(data["by_quarter"]));
     }
 
     $.get("./init.php", function(data) {
