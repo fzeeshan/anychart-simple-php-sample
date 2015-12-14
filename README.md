@@ -8,7 +8,7 @@
 * public/init.php - initial data for filters
 * public/data.php - data getter for charts with specific filters
 
-## Requirenments
+## Requirements
 * php 5.3+
 * mysql 5.0+
 * babel (optional) for converting jsx to js http://babeljs.io
@@ -25,7 +25,7 @@ Bash: `mysql -u user -p anychart_sample < dump.sql`
 You can change mysql connection settings in `public/data/Data.php` class constructor.
 
 ## Running on server
-Copy `public` folder to your server and open folder in browser.
+Copy `public` directory to your server and open directory in browser.
 
 ## Running locally
 Best way to run sample on your computer is to use vagrant. 
